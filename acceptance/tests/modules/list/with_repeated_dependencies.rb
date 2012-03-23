@@ -83,12 +83,12 @@ on master, puppet('module list') do
   assert_equal '', stderr
   assert_equal <<-STDOUT, stdout
 /etc/puppet/modules
-├── jimmy-appleseed (v1.1.0)
-├── jimmy-crakorn (v0.4.0)
-├── jimmy-steward (v0.9.0)
-└── jimmy-thelock (v1.0.0)
+├── jimmy-appleseed (\e[0;36mv1.1.0\e[0m)
+├── jimmy-crakorn (\e[0;36mv0.4.0\e[0m)
+├── jimmy-steward (\e[0;36mv0.9.0\e[0m)
+└── jimmy-thelock (\e[0;36mv1.0.0\e[0m)
 /usr/share/puppet/modules
-└── jimmy-crick (v1.0.1)
+└── jimmy-crick (\e[0;36mv1.0.1\e[0m)
 STDOUT
 end
 
@@ -97,14 +97,14 @@ on master, puppet('module list --tree') do
   assert_equal '', stderr
   assert_equal <<-STDOUT, stdout
 /etc/puppet/modules
-└─┬ jimmy-thelock (v1.0.0)
-  ├─┬ jimmy-crakorn (v0.4.0)
-  │ └── jimmy-steward (v0.9.0)
-  └── jimmy-appleseed (v1.1.0)
+└─┬ jimmy-thelock (\e[0;36mv1.0.0\e[0m)
+  ├─┬ jimmy-crakorn (\e[0;36mv0.4.0\e[0m)
+  │ └── jimmy-steward (\e[0;36mv0.9.0\e[0m)
+  └── jimmy-appleseed (\e[0;36mv1.1.0\e[0m)
 /usr/share/puppet/modules
-└─┬ jimmy-crick (v1.0.1)
-  └─┬ jimmy-crakorn (v0.4.0) [/etc/puppet/modules]
-    └── jimmy-steward (v0.9.0) [/etc/puppet/modules]
+└─┬ jimmy-crick (\e[0;36mv1.0.1\e[0m)
+  └─┬ jimmy-crakorn (\e[0;36mv0.4.0\e[0m) [/etc/puppet/modules]
+    └── jimmy-steward (\e[0;36mv0.9.0\e[0m) [/etc/puppet/modules]
 STDOUT
 end
 

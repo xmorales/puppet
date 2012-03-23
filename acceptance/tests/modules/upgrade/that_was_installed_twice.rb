@@ -9,11 +9,11 @@ on master, puppet("module install pmtacceptance-java --version 1.7.0 --modulepat
 on master, puppet("module list") do
   assert_output <<-OUTPUT
     /etc/puppet/modules
-    ├── pmtacceptance-java (v1.6.0)
-    └── pmtacceptance-stdlib (v1.0.0)
+    ├── pmtacceptance-java (\e[0;36mv1.6.0\e[0m)
+    └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
     /usr/share/puppet/modules
-    ├── pmtacceptance-java (v1.7.0)
-    └── pmtacceptance-stdlib (v1.0.0)
+    ├── pmtacceptance-java (\e[0;36mv1.7.0\e[0m)
+    └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
   OUTPUT
 end
 
@@ -33,11 +33,11 @@ step "Upgrade a module that exists multiple locations by restricting the --modul
 on master, puppet("module upgrade pmtacceptance-java --modulepath /etc/puppet/modules") do
   assert_output <<-OUTPUT
     Preparing to upgrade 'pmtacceptance-java' ...
-    Found 'pmtacceptance-java' (v1.6.0) in /etc/puppet/modules ...
+    Found 'pmtacceptance-java' (\e[0;36mv1.6.0\e[0m) in /etc/puppet/modules ...
     Downloading from http://forge.puppetlabs.com ...
     Upgrading -- do not interrupt ...
     /etc/puppet/modules
-    └── pmtacceptance-java (v1.6.0 -> v1.7.1)
+    └── pmtacceptance-java (\e[0;36mv1.6.0 -> v1.7.1\e[0m)
   OUTPUT
 end
 

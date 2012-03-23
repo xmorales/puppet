@@ -9,9 +9,9 @@ on master, puppet("module install pmtacceptance-apollo")
 on master, puppet("module list") do
   assert_output <<-OUTPUT
     /etc/puppet/modules
-    ├── pmtacceptance-apollo (v0.0.1)
-    ├── pmtacceptance-java (v1.7.0)
-    └── pmtacceptance-stdlib (v1.0.0)
+    ├── pmtacceptance-apollo (\e[0;36mv0.0.1\e[0m)
+    ├── pmtacceptance-java (\e[0;36mv1.7.0\e[0m)
+    └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
     /usr/share/puppet/modules (no modules installed)
   OUTPUT
 end
@@ -20,11 +20,11 @@ step "Upgrade a version-constrained module that has an upgrade"
 on master, puppet("module upgrade pmtacceptance-java") do
   assert_output <<-OUTPUT
     Preparing to upgrade 'pmtacceptance-java' ...
-    Found 'pmtacceptance-java' (v1.7.0) in /etc/puppet/modules ...
+    Found 'pmtacceptance-java' (\e[0;36mv1.7.0\e[0m) in /etc/puppet/modules ...
     Downloading from http://forge.puppetlabs.com ...
     Upgrading -- do not interrupt ...
     /etc/puppet/modules
-    └── pmtacceptance-java (v1.7.0 -> v1.7.1)
+    └── pmtacceptance-java (\e[0;36mv1.7.0 -> v1.7.1\e[0m)
   OUTPUT
 end
 
@@ -32,7 +32,7 @@ step "Try to upgrade a version-constrained module that has no upgrade"
 on master, puppet("module upgrade pmtacceptance-stdlib"), :acceptable_exit_codes => [0] do
   assert_output <<-OUTPUT
     STDOUT> Preparing to upgrade 'pmtacceptance-stdlib' ...
-    STDOUT> Found 'pmtacceptance-stdlib' (v1.0.0) in /etc/puppet/modules ...
+    STDOUT> Found 'pmtacceptance-stdlib' (\e[0;36mv1.0.0\e[0m) in /etc/puppet/modules ...
     STDOUT> Downloading from http://forge.puppetlabs.com ...
     STDERR> \e[1;31mError: Could not upgrade module 'pmtacceptance-stdlib' (v1.0.0 -> best: v1.0.0)
     STDERR>   The installed version is already the best fit for the current dependencies

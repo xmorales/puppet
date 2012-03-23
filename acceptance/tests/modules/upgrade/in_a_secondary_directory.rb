@@ -9,8 +9,8 @@ on master, puppet("module list") do
   assert_output <<-OUTPUT
     /etc/puppet/modules (no modules installed)
     /usr/share/puppet/modules
-    ├── pmtacceptance-java (v1.6.0)
-    └── pmtacceptance-stdlib (v1.0.0)
+    ├── pmtacceptance-java (\e[0;36mv1.6.0\e[0m)
+    └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
   OUTPUT
 end
 
@@ -18,11 +18,11 @@ step "Upgrade a module that has a more recent version published"
 on master, puppet("module upgrade pmtacceptance-java") do
   assert_output <<-OUTPUT
     Preparing to upgrade 'pmtacceptance-java' ...
-    Found 'pmtacceptance-java' (v1.6.0) in /usr/share/puppet/modules ...
+    Found 'pmtacceptance-java' (\e[0;36mv1.6.0\e[0m) in /usr/share/puppet/modules ...
     Downloading from http://forge.puppetlabs.com ...
     Upgrading -- do not interrupt ...
     /usr/share/puppet/modules
-    └── pmtacceptance-java (v1.6.0 -> v1.7.1)
+    └── pmtacceptance-java (\e[0;36mv1.6.0 -> v1.7.1\e[0m)
   OUTPUT
 end
 

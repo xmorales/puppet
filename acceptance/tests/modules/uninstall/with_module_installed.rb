@@ -24,7 +24,7 @@ step "Uninstall the module jimmy-crakorn"
 on master, puppet('module uninstall jimmy-crakorn') do
   assert_output <<-OUTPUT
     Preparing to uninstall 'jimmy-crakorn' ...
-    Removed 'jimmy-crakorn' (v0.4.0) from /etc/puppet/modules
+    Removed 'jimmy-crakorn' (\e[0;36mv0.4.0\e[0m) from /etc/puppet/modules
   OUTPUT
 end
 on master, '[ ! -d /etc/puppet/modules/crakorn ]'

@@ -12,7 +12,7 @@ on master, puppet("module search apache") do
   columns = stdout.lines.to_a[1].split(/\s{2}(?=\S)/)
   pattern = /^#{ columns.map { |c| c.chomp.gsub(/./, '.') }.join('  ') }$/
 
-  stdout.lines.to_a[1..-1].each do |line|
+  stdout.gsub(/\e.*?m/, '').lines.to_a[1..-1].each do |line|
     assert_match(pattern, line.chomp, 'columns were misaligned')
   end
 end

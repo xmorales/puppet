@@ -44,7 +44,7 @@ on master, puppet("module install pmtacceptance-git --ignore-dependencies") do
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └── pmtacceptance-git (v0.0.1)
+    └── pmtacceptance-git (\e[0;36mv0.0.1\e[0m)
   OUTPUT
 end
 on master, '[ -d /etc/puppet/modules/git ]'
@@ -86,7 +86,7 @@ on master, puppet("module install pmtacceptance-stdlib --force") do
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └── pmtacceptance-stdlib (v1.0.0)
+    └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
   OUTPUT
 end
 on master, '[ -d /etc/puppet/modules/stdlib ]'

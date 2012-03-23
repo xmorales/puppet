@@ -45,9 +45,9 @@ on master, puppet('module list') do
   assert_equal '', stderr
   assert_equal <<-STDOUT, stdout
 /etc/puppet/modules
-└── jimmy-appleseed (v1.1.0)
+└── jimmy-appleseed (\e[0;36mv1.1.0\e[0m)
 /usr/share/puppet/modules
-└── jimmy-crakorn (v0.4.0)
+└── jimmy-crakorn (\e[0;36mv0.4.0\e[0m)
 STDOUT
 end
 
@@ -56,11 +56,11 @@ on master, puppet('module list --tree') do
   assert_equal '', stderr
   assert_equal <<-STDOUT, stdout
 /etc/puppet/modules
-└─┬ jimmy-appleseed (v1.1.0)
-  └── jimmy-crakorn (v0.4.0) [/usr/share/puppet/modules]
+└─┬ jimmy-appleseed (\e[0;36mv1.1.0\e[0m)
+  └── jimmy-crakorn (\e[0;36mv0.4.0\e[0m) [/usr/share/puppet/modules]
 /usr/share/puppet/modules
-└─┬ jimmy-crakorn (v0.4.0)
-  └── jimmy-appleseed (v1.1.0) [/etc/puppet/modules]
+└─┬ jimmy-crakorn (\e[0;36mv0.4.0\e[0m)
+  └── jimmy-appleseed (\e[0;36mv1.1.0\e[0m) [/etc/puppet/modules]
 STDOUT
 end
 

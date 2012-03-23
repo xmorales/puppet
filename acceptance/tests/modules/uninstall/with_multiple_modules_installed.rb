@@ -9,11 +9,11 @@ on master, puppet("module install pmtacceptance-java --version 1.7.0 --modulepat
 on master, puppet("module list") do
   assert_output <<-OUTPUT
     /etc/puppet/modules
-    ├── pmtacceptance-java (v1.6.0)
-    └── pmtacceptance-stdlib (v1.0.0)
+    ├── pmtacceptance-java (\e[0;36mv1.6.0\e[0m)
+    └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
     /usr/share/puppet/modules
-    ├── pmtacceptance-java (v1.7.0)
-    └── pmtacceptance-stdlib (v1.0.0)
+    ├── pmtacceptance-java (\e[0;36mv1.7.0\e[0m)
+    └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
   OUTPUT
 end
 
@@ -33,7 +33,7 @@ step "Uninstall a module that exists multiple locations by restricting the --mod
 on master, puppet("module uninstall pmtacceptance-java --modulepath /etc/puppet/modules") do
   assert_output <<-OUTPUT
     Preparing to uninstall 'pmtacceptance-java' ...
-    Removed 'pmtacceptance-java' (v1.6.0) from /etc/puppet/modules
+    Removed 'pmtacceptance-java' (\e[0;36mv1.6.0\e[0m) from /etc/puppet/modules
   OUTPUT
 end
 

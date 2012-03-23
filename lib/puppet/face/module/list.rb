@@ -219,10 +219,10 @@ Puppet::Face.define(:module, '1.0.0') do
   #
   #   /etc/puppet/modules
   #   └─┬ puppetlabs-bacula (v0.0.2)
-  #   ├── puppetlabs-stdlib (v2.2.1)
-  #   ├─┬ puppetlabs-mysql (v1.0.0)
-  #   │ └── bodepd-create_resources (v0.0.1)
-  #   └── puppetlabs-sqlite (v0.0.1)
+  #     ├── puppetlabs-stdlib (v2.2.1)
+  #     ├─┬ puppetlabs-mysql (v1.0.0)
+  #     │ └── bodepd-create_resources (v0.0.1)
+  #     └── puppetlabs-sqlite (v0.0.1)
   #
   def list_format_tree(list, ancestors=[], parent=nil, params={})
     list.map do |mod|
@@ -236,8 +236,8 @@ Puppet::Face.define(:module, '1.0.0') do
           dep[:reason] == :missing
         end
         missing_deps.map do |mis_mod|
-          str = "UNMET DEPENDENCY #{mis_mod[:name].gsub('/', '-')} "
-          str << "(#{mis_mod[:version_constraint]})"
+          str = "#{colorize(:bg_red, 'UNMET DEPENDENCY')} #{mis_mod[:name].gsub('/', '-')} "
+          str << "(#{colorize(:cyan, mis_mod[:version_constraint])})"
           node[:dependencies] << { :text => str }
         end
         node[:dependencies] += list_format_tree(mod.dependencies_as_modules,
@@ -262,7 +262,7 @@ Puppet::Face.define(:module, '1.0.0') do
   def list_format_node(mod, parent, params)
     str = ''
     str << (mod.forge_name ? mod.forge_name.gsub('/', '-') : mod.name)
-    str << (mod.version ? " (v#{mod.version})" : ' (???)')
+    str << ' (' + colorize(:cyan, mod.version ? "v#{mod.version}" : '???') + ')'
 
     unless File.dirname(mod.path) == params[:path]
       str << " [#{File.dirname(mod.path)}]"
@@ -270,12 +270,12 @@ Puppet::Face.define(:module, '1.0.0') do
 
     if @unmet_deps[:version_mismatch].include?(mod.forge_name)
       if params[:label_invalid]
-        str << ' invalid'
+        str << '  ' + colorize(:red, 'invalid')
       elsif parent.respond_to?(:forge_name)
         unmet_parent = @unmet_deps[:version_mismatch][mod.forge_name][:parent]
         if (unmet_parent[:name] == parent.forge_name &&
             unmet_parent[:version] == "v#{parent.version}")
-          str << ' invalid'
+          str << '  ' + colorize(:red, 'invalid')
         end
       end
     end

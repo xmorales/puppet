@@ -2,11 +2,13 @@
 # Load standard libraries
 require 'pathname'
 require 'fileutils'
+require 'puppet/util/colors'
 
 # Define tool
 module Puppet
   class Module
     module Tool
+      extend Puppet::Util::Colors
 
       # Directory and names that should not be checksummed.
       ARTIFACTS = ['pkg', /^\./, /^~/, /^#/, 'coverage', 'metadata.json', 'REVISION']
@@ -66,6 +68,21 @@ module Puppet
         end
 
         return str
+      end
+
+      def self.format_tree(mods, dir)
+        mods.each do |mod|
+          version_string = mod[:version][:vstring].sub(/^(?!v)/, 'v')
+
+          if mod[:action] == :upgrade
+            previous_version = mod[:previous_version].sub(/^(?!v)/, 'v')
+            version_string = "#{previous_version} -> #{version_string}"
+          end
+
+          mod[:text] = "#{mod[:module]} (#{colorize(:cyan, version_string)})"
+          mod[:text] += " [#{mod[:path]}]" unless mod[:path] == dir
+          format_tree(mod[:dependencies], dir)
+        end
       end
     end
   end

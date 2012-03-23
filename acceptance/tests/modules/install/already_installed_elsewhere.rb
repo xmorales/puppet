@@ -55,7 +55,7 @@ on master, puppet("module install pmtacceptance-nginx --force") do
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └── pmtacceptance-nginx (v0.0.1)
+    └── pmtacceptance-nginx (\e[0;36mv0.0.1\e[0m)
   OUTPUT
 end
 on master, '[ -d /etc/puppet/modules/nginx ]'

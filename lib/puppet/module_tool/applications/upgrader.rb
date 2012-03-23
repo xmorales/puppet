@@ -1,6 +1,6 @@
 module Puppet::Module::Tool
   module Applications
-    class Upgrader
+    class Upgrader < Application
 
       include Puppet::Module::Tool::Errors
 
@@ -36,7 +36,7 @@ module Puppet::Module::Tool
           results[:requested_version] = @version || (@conditions[@module_name].empty? ? :latest : :best)
           dir = @module.modulepath
 
-          Puppet.notice "Found '#{@module_name}' (#{results[:installed_version] || '???'}) in #{dir} ..."
+          Puppet.notice "Found '#{@module_name}' (#{colorize(:cyan, results[:installed_version] || '???')}) in #{dir} ..."
           if !@options[:force] && @module.has_metadata? && @module.has_local_changes?
             raise LocalChangesError,
               :action            => :upgrade,

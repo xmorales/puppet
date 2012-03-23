@@ -65,10 +65,10 @@ on master, puppet('module list') do
 STDERR
   assert_equal <<-STDOUT, stdout
 /etc/puppet/modules
-├── jimmy-appleseed (v1.1.0)
-└── jimmy-thelock (v1.0.0)
+├── jimmy-appleseed (\e[0;36mv1.1.0\e[0m)
+└── jimmy-thelock (\e[0;36mv1.0.0\e[0m)
 /usr/share/puppet/modules
-└── jimmy-crick (v1.0.1)
+└── jimmy-crick (\e[0;36mv1.0.1\e[0m)
 STDOUT
 end
 
@@ -83,13 +83,13 @@ on master, puppet('module list --tree') do
 STDERR
   assert_equal <<-STDOUT, stdout
 /etc/puppet/modules
-└─┬ jimmy-thelock (v1.0.0)
-  ├── UNMET DEPENDENCY jimmy-sprinkles (v2.x)
-  └─┬ jimmy-appleseed (v1.1.0)
-    └── UNMET DEPENDENCY jimmy-crakorn (v0.4.0)
+└─┬ jimmy-thelock (\e[0;36mv1.0.0\e[0m)
+  ├── \e[0;41mUNMET DEPENDENCY\e[0m jimmy-sprinkles (\e[0;36mv2.x\e[0m)
+  └─┬ jimmy-appleseed (\e[0;36mv1.1.0\e[0m)
+    └── \e[0;41mUNMET DEPENDENCY\e[0m jimmy-crakorn (\e[0;36mv0.4.0\e[0m)
 /usr/share/puppet/modules
-└─┬ jimmy-crick (v1.0.1)
-  └── UNMET DEPENDENCY jimmy-crakorn (v0.4.x)
+└─┬ jimmy-crick (\e[0;36mv1.0.1\e[0m)
+  └── \e[0;41mUNMET DEPENDENCY\e[0m jimmy-crakorn (\e[0;36mv0.4.x\e[0m)
 STDOUT
 end
 

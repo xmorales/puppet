@@ -12,16 +12,16 @@ on master, puppet("module install pmtacceptance-php --version 0.0.1") do
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └─┬ pmtacceptance-php (v0.0.1)
-      └── pmtacceptance-apache (v0.0.1)
+    └─┬ pmtacceptance-php (\e[0;36mv0.0.1\e[0m)
+      └── pmtacceptance-apache (\e[0;36mv0.0.1\e[0m)
   OUTPUT
 end
 
 on master, puppet('module list') do
   assert_output <<-OUTPUT
     /etc/puppet/modules
-    ├── pmtacceptance-apache (v0.0.1)
-    └── pmtacceptance-php (v0.0.1)
+    ├── pmtacceptance-apache (\e[0;36mv0.0.1\e[0m)
+    └── pmtacceptance-php (\e[0;36mv0.0.1\e[0m)
     /usr/share/puppet/modules (no modules installed)
   OUTPUT
 end

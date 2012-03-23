@@ -28,7 +28,7 @@ on master, puppet("module install pmtacceptance-php --force") do
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └── pmtacceptance-php (v0.0.2)
+    └── pmtacceptance-php (\e[0;36mv0.0.2\e[0m)
   OUTPUT
 end
 on master, '[ -d /etc/puppet/modules/php ]'

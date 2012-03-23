@@ -12,8 +12,8 @@ on master, puppet("module install pmtacceptance-java") do
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └─┬ pmtacceptance-java (v1.7.1)
-      └── pmtacceptance-stdlib (v1.0.0)
+    └─┬ pmtacceptance-java (\e[0;36mv1.7.1\e[0m)
+      └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
   OUTPUT
 end
 on master, '[ -d /etc/puppet/modules/java ]'

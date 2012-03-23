@@ -10,10 +10,10 @@ on master, puppet("module install pmtacceptance-postgresql --version 0.0.1 --tar
 on master, puppet("module list") do
   assert_output <<-OUTPUT
     /etc/puppet/modules
-    ├── pmtacceptance-java (v1.6.0)
-    └── pmtacceptance-postgresql (v0.0.1)
+    ├── pmtacceptance-java (\e[0;36mv1.6.0\e[0m)
+    └── pmtacceptance-postgresql (\e[0;36mv0.0.1\e[0m)
     /usr/share/puppet/modules
-    └── pmtacceptance-stdlib (v0.0.2)
+    └── pmtacceptance-stdlib (\e[0;36mv0.0.2\e[0m)
   OUTPUT
 end
 
@@ -21,14 +21,14 @@ step "Upgrade a module that has a more recent version published"
 on master, puppet("module upgrade pmtacceptance-postgresql --version 0.0.2") do
   assert_output <<-OUTPUT
     Preparing to upgrade 'pmtacceptance-postgresql' ...
-    Found 'pmtacceptance-postgresql' (v0.0.1) in /etc/puppet/modules ...
+    Found 'pmtacceptance-postgresql' (\e[0;36mv0.0.1\e[0m) in /etc/puppet/modules ...
     Downloading from http://forge.puppetlabs.com ...
     Upgrading -- do not interrupt ...
     /etc/puppet/modules
-    └─┬ pmtacceptance-postgresql (v0.0.1 -> v0.0.2)
-      ├─┬ pmtacceptance-java (v1.6.0 -> v1.7.0)
-      │ └── pmtacceptance-stdlib (v0.0.2 -> v1.0.0) [/usr/share/puppet/modules]
-      └── pmtacceptance-stdlib (v0.0.2 -> v1.0.0) [/usr/share/puppet/modules]
+    └─┬ pmtacceptance-postgresql (\e[0;36mv0.0.1 -> v0.0.2\e[0m)
+      ├─┬ pmtacceptance-java (\e[0;36mv1.6.0 -> v1.7.0\e[0m)
+      │ └── pmtacceptance-stdlib (\e[0;36mv0.0.2 -> v1.0.0\e[0m) [/usr/share/puppet/modules]
+      └── pmtacceptance-stdlib (\e[0;36mv0.0.2 -> v1.0.0\e[0m) [/usr/share/puppet/modules]
   OUTPUT
 end
 

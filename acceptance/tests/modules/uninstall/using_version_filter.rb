@@ -36,8 +36,8 @@ on master, '[ -d /usr/share/puppet/modules/crakorn ]'
 step "Uninstall jimmy-crakorn version 0.5.x"
 on master, puppet('module uninstall jimmy-crakorn --version 0.5.x') do
   assert_output <<-OUTPUT
-    Preparing to uninstall 'jimmy-crakorn' (v0.5.x) ...
-    Removed 'jimmy-crakorn' (v0.5.1) from /usr/share/puppet/modules
+    Preparing to uninstall 'jimmy-crakorn' (\e[0;36mv0.5.x\e[0m) ...
+    Removed 'jimmy-crakorn' (\e[0;36mv0.5.1\e[0m) from /usr/share/puppet/modules
   OUTPUT
 end
 on master, '[ -d /etc/puppet/modules/crakorn ]'
@@ -46,7 +46,7 @@ on master, '[ ! -d /usr/share/puppet/modules/crakorn ]'
 step "Try to uninstall jimmy-crakorn v0.4.0 with `--version 0.5.x`"
 on master, puppet('module uninstall jimmy-crakorn --version 0.5.x'), :acceptable_exit_codes => [1] do
   assert_output <<-OUTPUT
-    STDOUT> Preparing to uninstall 'jimmy-crakorn' (v0.5.x) ...
+    STDOUT> Preparing to uninstall 'jimmy-crakorn' (\e[0;36mv0.5.x\e[0m) ...
     STDERR> \e[1;31mError: Could not uninstall module 'jimmy-crakorn' (v0.5.x)
     STDERR>   No installed version of 'jimmy-crakorn' matches (v0.5.x)
     STDERR>     'jimmy-crakorn' (v0.4.0) is installed in /etc/puppet/modules\e[0m

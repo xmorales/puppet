@@ -73,7 +73,7 @@ on master, puppet("module install pmtacceptance-nginx --force"), :acceptable_exi
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └── pmtacceptance-nginx (v0.0.1)
+    └── pmtacceptance-nginx (\e[0;36mv0.0.1\e[0m)
   OUTPUT
 end
 on master, '[ ! -f /etc/puppet/modules/nginx/extra.json ]'
@@ -85,7 +85,7 @@ on master, puppet("module install pmtacceptance-apache --force"), :acceptable_ex
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └── pmtacceptance-apache (v0.0.1)
+    └── pmtacceptance-apache (\e[0;36mv0.0.1\e[0m)
   OUTPUT
 end
 on master, '[ ! -f /etc/puppet/modules/apache/extra.json ]'

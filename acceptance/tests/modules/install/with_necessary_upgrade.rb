@@ -12,16 +12,16 @@ on master, puppet("module install pmtacceptance-java --version 1.6.0") do
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └─┬ pmtacceptance-java (v1.6.0)
-      └── pmtacceptance-stdlib (v1.0.0)
+    └─┬ pmtacceptance-java (\e[0;36mv1.6.0\e[0m)
+      └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
   OUTPUT
 end
 
 on master, puppet('module list --tree') do
   assert_output <<-OUTPUT
     /etc/puppet/modules
-    └─┬ pmtacceptance-java (v1.6.0)
-      └── pmtacceptance-stdlib (v1.0.0)
+    └─┬ pmtacceptance-java (\e[0;36mv1.6.0\e[0m)
+      └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
     /usr/share/puppet/modules (no modules installed)
   OUTPUT
 end
@@ -34,17 +34,17 @@ on master, puppet("module install pmtacceptance-apollo") do
     Downloading from http://forge.puppetlabs.com ...
     Installing -- do not interrupt ...
     /etc/puppet/modules
-    └─┬ pmtacceptance-apollo (v0.0.1)
-      └── pmtacceptance-java (v1.6.0 -> v1.7.1)
+    └─┬ pmtacceptance-apollo (\e[0;36mv0.0.1\e[0m)
+      └── pmtacceptance-java (\e[0;36mv1.6.0 -> v1.7.1\e[0m)
   OUTPUT
 end
 
 on master, puppet('module list') do
   assert_output <<-OUTPUT
     /etc/puppet/modules
-    ├── pmtacceptance-apollo (v0.0.1)
-    ├── pmtacceptance-java (v1.7.1)
-    └── pmtacceptance-stdlib (v1.0.0)
+    ├── pmtacceptance-apollo (\e[0;36mv0.0.1\e[0m)
+    ├── pmtacceptance-java (\e[0;36mv1.7.1\e[0m)
+    └── pmtacceptance-stdlib (\e[0;36mv1.0.0\e[0m)
     /usr/share/puppet/modules (no modules installed)
   OUTPUT
 end

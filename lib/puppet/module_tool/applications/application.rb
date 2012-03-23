@@ -1,9 +1,11 @@
 require 'net/http'
 require 'semver'
+require 'puppet/util/colors'
 
 module Puppet::Module::Tool
   module Applications
     class Application
+      include Puppet::Util::Colors
 
       def self.run(*args)
         new(*args).run
