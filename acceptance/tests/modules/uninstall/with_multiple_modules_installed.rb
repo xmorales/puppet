@@ -1,41 +1,43 @@
 begin test_name "puppet module uninstall (with multiple modules installed)"
 
-step "Setup"
-apply_manifest_on master, <<-PP
-file {
-  [
-    '/etc/puppet/modules',
-    '/etc/puppet/modules/crakorn',
-    '/usr/share/puppet',
-    '/usr/share/puppet/modules',
-    '/usr/share/puppet/modules/crakorn',
-  ]: ensure => directory;
-  [
-    '/etc/puppet/modules/crakorn/metadata.json',
-    '/usr/share/puppet/modules/crakorn/metadata.json',
-  ]: content => '{
-    "name": "jimmy/crakorn",
-    "version": "0.4.0",
-    "source": "",
-    "author": "jimmy",
-    "license": "MIT",
-    "dependencies": []
-  }';
-}
-PP
-on master, '[ -d /etc/puppet/modules/crakorn ]'
-
-step "Uninstall the module jimmy-crakorn"
-on master, puppet('module uninstall jimmy-crakorn') do
-  assert_equal '', stderr
-  assert_equal <<-STDOUT, stdout
-Removed /etc/puppet/modules/crakorn (v0.4.0)
-Removed /usr/share/puppet/modules/crakorn (v0.4.0)
-STDOUT
+step 'Setup'
+require 'resolv'; ip = Resolv.getaddress('forge-dev.puppetlabs.com')
+apply_manifest_on master, "host { 'forge.puppetlabs.com': ip => '#{ip}' }"
+apply_manifest_on master, "file { ['/etc/puppet/modules', '/usr/share/puppet/modules']: ensure => directory, recurse => true, purge => true, force => true }"
+on master, puppet("module install pmtacceptance-java --version 1.6.0 --modulepath /etc/puppet/modules")
+on master, puppet("module install pmtacceptance-java --version 1.7.0 --modulepath /usr/share/puppet/modules")
+on master, puppet("module list") do
+  assert_output <<-OUTPUT
+    /etc/puppet/modules
+    ├── pmtacceptance-java (v1.6.0)
+    └── pmtacceptance-stdlib (v1.0.0)
+    /usr/share/puppet/modules
+    ├── pmtacceptance-java (v1.7.0)
+    └── pmtacceptance-stdlib (v1.0.0)
+  OUTPUT
 end
-on master, '[ ! -d /etc/puppet/modules/crakorn ]'
-on master, '[ ! -d /usr/share/puppet/modules/crakorn ]'
+
+step "Try to uninstall a module that exists multiple locations in the module path"
+on master, puppet("module uninstall pmtacceptance-java"), :acceptable_exit_codes => [1] do
+  assert_output <<-OUTPUT
+    STDOUT> Preparing to uninstall 'pmtacceptance-java' ...
+    STDERR> \e[1;31mError: Could not uninstall module 'pmtacceptance-java'
+    STDERR>   Module 'pmtacceptance-java' appears multiple places in the module path
+    STDERR>     'pmtacceptance-java' (v1.6.0) was found in /etc/puppet/modules
+    STDERR>     'pmtacceptance-java' (v1.7.0) was found in /usr/share/puppet/modules
+    STDERR>     Use the `--modulepath` option to limit the search to specific directories\e[0m
+  OUTPUT
+end
+
+step "Uninstall a module that exists multiple locations by restricting the --modulepath"
+on master, puppet("module uninstall pmtacceptance-java --modulepath /etc/puppet/modules") do
+  assert_output <<-OUTPUT
+    Preparing to uninstall 'pmtacceptance-java' ...
+    Removed 'pmtacceptance-java' (v1.6.0) from /etc/puppet/modules
+  OUTPUT
+end
 
 ensure step "Teardown"
+apply_manifest_on master, "host { 'forge.puppetlabs.com': ensure => absent }"
 apply_manifest_on master, "file { ['/etc/puppet/modules', '/usr/share/puppet/modules']: ensure => directory, recurse => true, purge => true, force => true }"
 end

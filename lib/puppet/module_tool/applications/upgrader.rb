@@ -22,10 +22,13 @@ module Puppet::Module::Tool
 
           if @installed[@module_name].length > 1
             raise MultipleInstalledError,
+              :action            => :upgrade,
               :module_name       => @module_name,
               :installed_modules => @installed[@module_name].sort_by { |mod| @environment.modulepath.index(mod.modulepath) }
           elsif @installed[@module_name].empty?
-            raise NotInstalledError, :module_name => @module_name
+            raise NotInstalledError,
+              :action      => :upgrade,
+              :module_name => @module_name
           end
 
           @module = @installed[@module_name].last
@@ -36,6 +39,7 @@ module Puppet::Module::Tool
           Puppet.notice "Found '#{@module_name}' (#{results[:installed_version] || '???'}) in #{dir} ..."
           if !@options[:force] && @module.has_metadata? && @module.has_local_changes?
             raise LocalChangesError,
+              :action            => :upgrade,
               :module_name       => @module_name,
               :requested_version => @version || (@conditions[@module_name].empty? ? :latest : :best),
               :installed_version => @module.version

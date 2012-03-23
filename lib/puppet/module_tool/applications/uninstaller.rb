@@ -1,132 +1,105 @@
 module Puppet::Module::Tool
   module Applications
     class Uninstaller < Application
+      include Puppet::Module::Tool::Errors
 
       def initialize(name, options)
-        @name = name
-        @options = options
-        @errors = Hash.new {|h, k| h[k] = {}}
-        @removed_mods = []
+        @name        = name
+        @options     = options
+        @errors      = Hash.new {|h, k| h[k] = {}}
+        @unfiltered  = []
+        @installed   = []
         @suggestions = []
         @environment = Puppet::Node::Environment.new(options[:environment])
       end
 
       def run
-        if module_installed?
-          uninstall
-        else
-          msg = "Could not uninstall module '#{@name}':\n"
-          msg << "  Module '#{@name}' is not installed\n"
-          @suggestions.each do |suggestion|
-            msg << "    You may have meant `puppet module uninstall #{suggestion}`\n"
-          end
-          Puppet.err msg.chomp
-          exit(1)
-        end
-
-        if (@errors.keys.count > 0) && @removed_mods.empty?
-          msg = ''
-          @errors.map do |mod_name, details|
-            unless details[:errors].empty?
-              mod_version = options[:version] || details[:version]
-
-              header = "Could not uninstall module '#{mod_name}'"
-              header << " (v#{mod_version})"
-              msg << "#{header}:\n"
-              details[:errors].map { |error| msg << "  #{error}\n" }
-            end
-          end
-          Puppet.err msg.chomp
-          exit(1)
-        end
-
-        {
-          :removed_mods => @removed_mods.sort_by do |mod|
-            @environment.modulepath.index(mod.modulepath)
-          end,
-          :options => @options
+        results = {
+          :module_name       => @name,
+          :requested_version => @version,
         }
+
+        begin
+          find_installed_module
+          validate_module
+          FileUtils.rm_rf(@installed.first.path)
+
+          results[:affected_modules] = @installed
+          results[:result] = :success
+        rescue ModuleToolError => err
+          results[:error] = {
+            :oneline   => err.message,
+            :multiline => err.multiline,
+          }
+        rescue => e
+          results[:error] = {
+            :oneline => e.message,
+            :multiline => e.respond_to?(:multiline) ? e.multiline : [e.to_s, e.backtrace].join("\n")
+          }
+        ensure
+          results[:result] ||= :failure
+        end
+
+        results
       end
 
       private
 
-      def version_match?(mod)
-        if @options[:version]
-          SemVer[@options[:version]].include? SemVer.new(mod.version)
-        else
-          true
-        end
-      end
-
-      # Only match installed modules by forge_name, which ensures the module
-      # has proper metadata and a good sign it was install by the module
-      # tool.
-      def module_installed?
-        @environment.modules_by_path.each do |path, modules|
-          modules.each do |mod|
-            if mod.has_metadata?
-              full_name = mod.forge_name.sub('/', '-')
-              if full_name == @name
-                return true
-              else
-                if full_name =~ /#{@name}/
-                  @suggestions << full_name
-                end
-              end
-            elsif mod.name == @name
-               return true
+      def find_installed_module
+        @environment.modules_by_path.values.flatten.each do |mod|
+          mod_name = (mod.forge_name || mod.name).gsub('/', '-')
+          if mod_name == @name
+            @unfiltered << {
+              :name    => mod_name,
+              :version => mod.version,
+              :path    => mod.modulepath,
+            }
+            if @options[:version] && mod.version
+              next unless SemVer[@options[:version]].include?(SemVer.new(mod.version))
             end
+            @installed << mod
+          elsif mod_name =~ /#{@name}/
+            @suggestions << mod_name
           end
         end
 
-        false
+        if @installed.length > 1
+          raise MultipleInstalledError,
+            :action            => :uninstall,
+            :module_name       => @name,
+            :installed_modules => @installed.sort_by { |mod| @environment.modulepath.index(mod.modulepath) }
+        elsif @installed.empty?
+          if @unfiltered.empty?
+            raise NotInstalledError,
+              :action      => :uninstall,
+              :suggestions => @suggestions,
+              :module_name => @name
+          else
+            raise NoVersionMatchesError,
+              :installed_modules => @unfiltered.sort_by { |mod| @environment.modulepath.index(mod[:path]) },
+              :version_range     => @options[:version],
+              :module_name       => @name
+          end
+        end
       end
 
-      def uninstall
-        @environment.modules_by_path.each do |path, modules|
-          modules.each do |mod|
+      def validate_module
+        mod = @installed.first
 
-            if mod.has_metadata?
-              full_name = mod.forge_name.sub('/', '-')
+        if !@options[:force] && mod.has_metadata? && mod.has_local_changes?
+          raise LocalChangesError,
+            :action            => :uninstall,
+            :module_name       => (mod.forge_name || mod.name).gsub('/', '-'),
+            :requested_version => @options[:version],
+            :installed_version => mod.version
+        end
 
-              if full_name == @name
-                @errors[full_name][:version] = mod.version
-                @errors[full_name][:errors]  = []
-
-                # If required, check for version match
-                unless version_match?(mod)
-                  @errors[full_name][:errors] << "Installed version of '#{full_name}' (v#{mod.version}) does not match (v#{@options[:version]})"
-                  next
-                end
-
-                if mod.has_local_changes?
-                  unless @options[:force]
-                    @errors[full_name][:errors] << "Installed version of #{full_name} (v#{mod.version}) has local changes"
-                  end
-                end
-
-                requires_me = mod.required_by
-                unless requires_me.empty? or @options[:force]
-                  requires_me.each do |req|
-                    req_name = req['name'].sub('/', '-')
-                    req_version = req['version']
-
-                    @errors[full_name][:errors] << "Module '#{full_name}' (v#{mod.version}) is required by '#{req_name}' (v#{req_version})"
-                    @errors[full_name][:errors] << "  Supply the `--force` flag to uninstall this module anyway"
-                    next
-                  end
-                end
-
-                if @errors[full_name][:errors].empty? && @errors[full_name][:version] == mod.version
-                  FileUtils.rm_rf(mod.path)
-                  @removed_mods << mod
-                end
-              end
-            elsif mod.name == @name
-              FileUtils.rm_rf(mod.path)
-              @removed_mods << mod
-            end
-          end
+        if !@options[:force] && !mod.required_by.empty?
+          raise ModuleIsRequiredError,
+            :module_name       => (mod.forge_name || mod.name).gsub('/', '-'),
+            :required_by       => mod.required_by,
+            :requested_version => @options[:version],
+            :installed_version => mod.version
         end
       end
     end

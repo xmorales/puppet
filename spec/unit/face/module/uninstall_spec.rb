@@ -24,10 +24,7 @@ describe "puppet module uninstall" do
 
     it "should accept the --environment option" do
       options[:environment] = "development"
-      expected_options = {
-        :environment => 'development',
-        :name => 'puppetlabs-apache'
-      }
+      expected_options = { :environment => 'development' }
       Puppet::Module::Tool::Applications::Uninstaller.expects(:run).with("puppetlabs-apache", expected_options).once
       subject.uninstall("puppetlabs-apache", options)
     end
@@ -37,9 +34,7 @@ describe "puppet module uninstall" do
       expected_options = {
         :modulepath => '/foo/puppet/modules',
         :environment => 'production',
-        :name => 'puppetlabs-apache',
       }
-      File.expects(:directory?).with("/foo/puppet/modules").returns(true)
       Puppet::Module::Tool::Applications::Uninstaller.expects(:run).with("puppetlabs-apache", expected_options).once
       subject.uninstall("puppetlabs-apache", options)
     end
@@ -49,7 +44,6 @@ describe "puppet module uninstall" do
       expected_options = {
         :version => '1.0.0',
         :environment => 'production',
-        :name => 'puppetlabs-apache',
       }
       Puppet::Module::Tool::Applications::Uninstaller.expects(:run).with("puppetlabs-apache", expected_options).once
       subject.uninstall("puppetlabs-apache", options)
@@ -59,8 +53,7 @@ describe "puppet module uninstall" do
       options[:force] = true
       expected_options = {
         :environment => 'production',
-        :name => 'puppetlabs-apache',
-        :force => true
+        :force => true,
       }
       Puppet::Module::Tool::Applications::Uninstaller.expects(:run).with("puppetlabs-apache", expected_options).once
       subject.uninstall("puppetlabs-apache", options)

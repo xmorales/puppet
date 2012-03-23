@@ -1,63 +1,17 @@
 module Puppet::Module::Tool::Errors
 
-  class UpgradeError < ModuleToolError; end
-
-  class MultipleInstalledError < UpgradeError
-    def initialize(options)
-      @module_name = options[:module_name]
-      @modules     = options[:installed_modules]
-      super "Could not upgrade '#{@module_name}'; module appears in multiple places in the module path"
-    end
-
-    def multiline
-      message = []
-      message << "Could not upgrade module '#{@module_name}'"
-      message << "  Module '#{@module_name}' appears multiple places in the module path"
-      message += @modules.map do |mod|
-        "    '#{@module_name}' (#{v(mod.version)}) was found in #{mod.modulepath}"
-      end
-      message << "    Use the `--modulepath` option to limit the search to specific directories"
-      message.join("\n")
-    end
-  end
-
-  class NotInstalledError < UpgradeError
-    def initialize(options)
-      @module_name = options[:module_name]
-      super "Could not upgrade '#{@module_name}'; module is not installed"
-    end
-
-    def multiline
-      message = []
-      message << "Could not upgrade module '#{@module_name}'"
-      message << "  Module '#{@module_name}' is not installed"
-      message << "    Use `puppet module install` to install this module"
-      message.join("\n")
-    end
-  end
-
-  class LocalChangesError < UpgradeError
-    def initialize(options)
-      @module_name = options[:module_name]
-      @requested_version = v(options[:requested_version])
-      @installed_version = v(options[:installed_version])
-      super "Could not upgrade '#{@module_name}'; module is not installed"
-    end
-
-    def multiline
-      message = []
-      message << "Could not upgrade module '#{@module_name}' (#{v(@installed_version)} -> #{v(@requested_version)})"
-      message << "  Installed module has had changes made locally"
-      message << "    Use `puppet module upgrade --force` to upgrade this module anyway"
-      message.join("\n")
+  class UpgradeError < ModuleToolError
+    def initialize(msg)
+      @action = :upgrade
+      super
     end
   end
 
   class VersionAlreadyInstalledError < UpgradeError
     def initialize(options)
       @module_name       = options[:module_name]
-      @requested_version = v(options[:requested_version])
-      @installed_version = v(options[:installed_version])
+      @requested_version = options[:requested_version]
+      @installed_version = options[:installed_version]
       @dependency_name   = options[:dependency_name]
       @conditions        = options[:conditions]
       super "Could not upgrade '#{@module_name}'; module is not installed"
@@ -65,7 +19,7 @@ module Puppet::Module::Tool::Errors
 
     def multiline
       message = []
-      message << "Could not upgrade module '#{@module_name}' (#{v(@installed_version)} -> #{v(@requested_version)})"
+      message << "Could not upgrade module '#{@module_name}' (#{vstring})"
       if @conditions.length == 1 && @conditions.last[:version].nil?
         message << "  The installed version is already the latest version"
       else
@@ -93,7 +47,7 @@ module Puppet::Module::Tool::Errors
 
     def multiline
       message = []
-      message << "Could not upgrade module '#{@module_name}' (#{v(@installed_version)} -> #{v(@requested_version)})"
+      message << "Could not upgrade module '#{@module_name}' (#{vstring})"
       message << "  Module '#{@module_name}' does not exist on #{@repository}"
       message.join("\n")
     end
@@ -105,12 +59,12 @@ module Puppet::Module::Tool::Errors
       @installed_version = options[:installed_version]
       @requested_version = options[:requested_version]
       @repository        = options[:repository]
-      super "Could not upgrade '#{@module_name}' (#{v(@installed_version)} -> #{v(@requested_version)}); module has no versions #{ @requested_version && "matching #{v(@requested_version)} "}published on #{@repository}"
+      super "Could not upgrade '#{@module_name}' (#{vstring}); module has no versions #{ @requested_version && "matching #{v(@requested_version)} "}published on #{@repository}"
     end
 
     def multiline
       message = []
-      message << "Could not upgrade module '#{@module_name}' (#{v(@installed_version)} -> #{v(@requested_version)})"
+      message << "Could not upgrade module '#{@module_name}' (#{vstring})"
       message << "  No version matching '#{@requested_version || ">= 0.0.0"}' exists on #{@repository}"
       message.join("\n")
     end

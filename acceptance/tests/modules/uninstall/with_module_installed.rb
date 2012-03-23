@@ -22,13 +22,13 @@ on master, '[ -d /etc/puppet/modules/crakorn ]'
 
 step "Uninstall the module jimmy-crakorn"
 on master, puppet('module uninstall jimmy-crakorn') do
-  assert_equal '', stderr
-  assert_equal <<-STDOUT, stdout
-Removed /etc/puppet/modules/crakorn (v0.4.0)
-STDOUT
+  assert_output <<-OUTPUT
+    Preparing to uninstall 'jimmy-crakorn' ...
+    Removed 'jimmy-crakorn' (v0.4.0) from /etc/puppet/modules
+  OUTPUT
 end
 on master, '[ ! -d /etc/puppet/modules/crakorn ]'
 
 ensure step "Teardown"
-apply_manifest_on master, "file { '/etc/puppet/modules': recurse => true, purge => true, force => true }"
+apply_manifest_on master, "file { ['/etc/puppet/modules', '/usr/share/puppet/modules']: ensure => directory, recurse => true, purge => true, force => true }"
 end

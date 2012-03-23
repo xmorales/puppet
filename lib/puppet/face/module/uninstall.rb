@@ -9,24 +9,24 @@ Puppet::Face.define(:module, '1.0.0') do
     returns "Hash of module objects representing uninstalled modules and related errors."
 
     examples <<-EOT
-      Uninstall a module from all directories in the modulepath:
+      Uninstall a module:
 
-      $ puppet module uninstall ssh
+      $ puppet module uninstall puppetlabs-ssh
       Removed /etc/puppet/modules/ssh (v1.0.0)
 
       Uninstall a module from a specific directory:
 
-      $ puppet module uninstall --modulepath /usr/share/puppet/modules ssh
+      $ puppet module uninstall puppetlabs-ssh --modulepath /usr/share/puppet/modules
       Removed /usr/share/puppet/modules/ssh (v1.0.0)
 
       Uninstall a module from a specific environment:
 
-      $ puppet module uninstall --environment development
+      $ puppet module uninstall puppetlabs-ssh --environment development
       Removed /etc/puppet/environments/development/modules/ssh (v1.0.0)
 
       Uninstall a specific version of a module:
 
-      $ puppet module uninstall --version 2.0.0 ssh
+      $ puppet module uninstall puppetlabs-ssh --version 2.0.0
       Removed /etc/puppet/modules/ssh (v2.0.0)
     EOT
 
@@ -64,29 +64,23 @@ Puppet::Face.define(:module, '1.0.0') do
     end
 
     when_invoked do |name, options|
-      if options[:modulepath]
-        unless File.directory?(options[:modulepath])
-          raise ArgumentError, "Directory #{options[:modulepath]} does not exist"
-        end
-      end
-
       Puppet[:modulepath] = options[:modulepath] if options[:modulepath]
-      options[:name] = name
+      name = name.gsub('/', '-')
 
+      Puppet.notice "Preparing to uninstall '#{name}'" << (options[:version] ? " (#{options[:version].sub(/^(?=\d)/, 'v')})" : '') << " ..."
       Puppet::Module::Tool::Applications::Uninstaller.run(name, options)
     end
 
     when_rendering :console do |return_value|
-      output = ''
-
-      return_value[:removed_mods].each do |mod|
-        msg = "Removed #{mod.path}"
-        msg << " (v#{mod.version})" if mod.version
-        msg << "\n"
-        output << msg
+      if return_value[:result] == :failure
+        Puppet.err(return_value[:error][:multiline])
+        exit 1
+      else
+        mod = return_value[:affected_modules].first
+        "Removed '#{return_value[:module_name]}'" <<
+        (mod.version ? " (#{mod.version.to_s.sub(/^(?=\d)/, 'v')})" : '') <<
+        " from #{mod.modulepath}"
       end
-
-      output
     end
   end
 end

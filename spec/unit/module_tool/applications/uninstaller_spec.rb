@@ -56,8 +56,8 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
     end
 
     context "when the module is not installed" do
-      it "should exit with the proper status code" do
-        expect { @uninstaller.new('fakemod_not_installed', options).run }.to exit_with 1
+      it "should fail" do
+        @uninstaller.new('fakemod_not_installed', options).run[:result].should == :failure
       end
     end
 
@@ -67,7 +67,7 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
         PuppetSpec::Modules.create('foo', modpath1, :metadata => foo_metadata)
 
         results = @uninstaller.new("puppetlabs-foo", options).run
-        results[:removed_mods].first.forge_name.should == "puppetlabs/foo"
+        results[:affected_modules].first.forge_name.should == "puppetlabs/foo"
       end
 
       it "should only uninstall the requested module" do
@@ -75,18 +75,15 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
         PuppetSpec::Modules.create('bar', modpath1, :metadata => bar_metadata)
 
         results = @uninstaller.new("puppetlabs-foo", options).run
-        results[:removed_mods].length == 1
-        results[:removed_mods].first.forge_name.should == "puppetlabs/foo"
+        results[:affected_modules].length == 1
+        results[:affected_modules].first.forge_name.should == "puppetlabs/foo"
       end
 
-      it "should uninstall the module from every path in the modpath" do
+      it "should uninstall fail if a module exists twice in the modpath" do
         PuppetSpec::Modules.create('foo', modpath1, :metadata => foo_metadata)
         PuppetSpec::Modules.create('foo', modpath2, :metadata => foo_metadata)
 
-        results = @uninstaller.new('puppetlabs-foo', options).run
-        results[:removed_mods].length.should == 2
-        results[:removed_mods][0].forge_name.should == "puppetlabs/foo"
-        results[:removed_mods][1].forge_name.should == "puppetlabs/foo"
+        @uninstaller.new('puppetlabs-foo', options).run[:result].should == :failure
       end
 
       context "when options[:version] is specified" do
@@ -97,9 +94,9 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
           options[:version] = "1.0.0"
 
           results = @uninstaller.new("puppetlabs-foo", options).run
-          results[:removed_mods].length.should == 1
-          results[:removed_mods].first.forge_name.should == "puppetlabs/foo"
-          results[:removed_mods].first.version.should == "1.0.0"
+          results[:affected_modules].length.should == 1
+          results[:affected_modules].first.forge_name.should == "puppetlabs/foo"
+          results[:affected_modules].first.version.should == "1.0.0"
         end
 
         it "should not uninstall the module if the version does not match" do
@@ -107,7 +104,7 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
 
           options[:version] = "2.0.0"
 
-          expect { @uninstaller.new("puppetlabs-foo", options).run }.to exit_with 1
+          @uninstaller.new("puppetlabs-foo", options).run[:result].should == :failure
         end
       end
 
@@ -116,7 +113,7 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
         it "should not uninstall the module" do
           PuppetSpec::Modules.create('foo', modpath1)
 
-          expect { @uninstaller.new("puppetlabs-foo", options).run }.to exit_with 1
+          @uninstaller.new("puppetlabs-foo", options).run[:result].should == :failure
         end
       end
 
@@ -126,7 +123,7 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
           PuppetSpec::Modules.create('foo', modpath1, :metadata => foo_metadata)
           Puppet::Module.any_instance.stubs(:has_local_changes?).returns(true)
 
-          expect { @uninstaller.new("puppetlabs-foo", options).run }.to exit_with 1
+          @uninstaller.new("puppetlabs-foo", options).run[:result].should == :failure
         end
 
       end
@@ -137,8 +134,8 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
           PuppetSpec::Modules.create('foo', modpath1, :metadata => foo_metadata)
 
           results = @uninstaller.new("puppetlabs-foo", options).run
-          results[:removed_mods].length.should == 1
-          results[:removed_mods].first.forge_name.should == "puppetlabs/foo"
+          results[:affected_modules].length.should == 1
+          results[:affected_modules].first.forge_name.should == "puppetlabs/foo"
         end
       end
 
@@ -159,7 +156,7 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
             }
           )
 
-          expect { @uninstaller.new("puppetlabs-foo", options).run }.to exit_with 1
+          @uninstaller.new("puppetlabs-foo", options).run[:result].should == :failure
         end
       end
 
@@ -178,8 +175,8 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
           options[:force] = true
 
           results = @uninstaller.new("puppetlabs-foo", options).run
-          results[:removed_mods].length.should == 1
-          results[:removed_mods].first.forge_name.should == "puppetlabs/foo"
+          results[:affected_modules].length.should == 1
+          results[:affected_modules].first.forge_name.should == "puppetlabs/foo"
         end
 
         it "should ignore broken dependencies" do
@@ -200,8 +197,8 @@ describe Puppet::Module::Tool::Applications::Uninstaller do
           options[:force] = true
 
           results = @uninstaller.new("puppetlabs-foo", options).run
-          results[:removed_mods].length.should == 1
-          results[:removed_mods].first.forge_name.should == "puppetlabs/foo"
+          results[:affected_modules].length.should == 1
+          results[:affected_modules].first.forge_name.should == "puppetlabs/foo"
         end
       end
     end
