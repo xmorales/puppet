@@ -35,7 +35,7 @@ class a {
 }
 PP
 
-on master, "chown -R #{master['user']}:#{master['group']} #{testdir}"
+on master, "chown -R #{master.puppet['user']}:#{master.puppet['group']} #{testdir}"
 on master, "chmod -R g+rwX #{testdir}"
 on master, "chmod -R a+x #{testdir}/enc"
 

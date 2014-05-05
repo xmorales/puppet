@@ -24,7 +24,7 @@ master_opts = {
 
 create_remote_file(master, "#{testdir}/different.pp", 'notify { "expected_string": }')
 
-on master, "chown -R #{master['user']}:#{master['group']} #{testdir}"
+on master, "chown -R #{master.puppet['user']}:#{master.puppet['group']} #{testdir}"
 on master, "chmod -R g+rwX #{testdir}"
 
 with_puppet_running_on master, master_opts, testdir do

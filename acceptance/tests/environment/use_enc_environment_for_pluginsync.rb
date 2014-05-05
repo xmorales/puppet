@@ -26,15 +26,15 @@ on master, "mkdir -p #{testdir}/modules"
 on master, "mkdir -p #{testdir}/special/amod/lib/puppet"
 create_remote_file(master, "#{testdir}/special/amod/lib/puppet/foo.rb", "#special_version")
 
-on master, "chown -R #{master['user']}:#{master['group']} #{testdir}"
+on master, "chown -R #{master.puppet['user']}:#{master.puppet['group']} #{testdir}"
 on master, "chmod -R g+rwX #{testdir}"
 
 with_puppet_running_on master, master_opts, testdir do
 
   agents.each do |agent|
     run_agent_on(agent, "--no-daemonize --onetime --server #{master}")
-    on agent, "cat #{agent['puppetvardir']}/lib/puppet/foo.rb"
+    on agent, "cat #{agent['vardir']}/lib/puppet/foo.rb"
     assert_match(/#special_version/, stdout, "The plugin from environment 'special' was not synced")
-    on agent, "rm -rf #{agent['puppetvardir']}/lib"
+    on agent, "rm -rf #{agent.puppet['vardir']}/lib"
   end
 end

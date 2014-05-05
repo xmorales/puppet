@@ -44,7 +44,7 @@ test_name "Install packages and repositories on target machines..." do
 
   step "Agents: create basic puppet.conf" do
     agents.each do |agent|
-      puppetconf = File.join(agent['puppetpath'], 'puppet.conf')
+      puppetconf = File.join(agent.puppet['confdir'], 'puppet.conf')
 
       on agent, "echo '[agent]' > #{puppetconf} && " +
                 "echo server=#{master} >> #{puppetconf}"

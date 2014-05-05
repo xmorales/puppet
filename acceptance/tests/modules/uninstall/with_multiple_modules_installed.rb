@@ -11,7 +11,7 @@ teardown do
 end
 
 on master, "mkdir -p #{testdir}/modules"
-on master, "chown -R #{master['user']}:#{master['group']} #{testdir}"
+on master, "chown -R #{master.puppet['user']}:#{master.puppet['group']} #{testdir}"
 
 master_opts = {
   'main' => {

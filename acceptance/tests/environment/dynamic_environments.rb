@@ -50,8 +50,8 @@ end
 manifest = <<-MANIFEST
 File {
   ensure => directory,
-  owner => #{master['user']},
-  group => #{master['group']},
+  owner => #{master.puppet['user']},
+  group => #{master.puppet['group']},
   mode => 0750,
 }
 

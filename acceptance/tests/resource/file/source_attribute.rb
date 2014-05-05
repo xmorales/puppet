@@ -37,7 +37,7 @@ EOF
 
 on master, "chmod -R 777 #{testdir}"
 on master, "chmod -R 644 #{mod_manifest} #{source_path} #{manifest}"
-on master, "chown -R #{master['user']}:#{master['group']} #{testdir}"
+on master, "chown -R #{master.puppet['user']}:#{master.puppet['group']} #{testdir}"
 
 master_opts = {
   'master' => {

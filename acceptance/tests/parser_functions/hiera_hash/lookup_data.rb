@@ -4,7 +4,7 @@ testdir = master.tmpdir('hiera')
 
 step 'Setup'
 on master, "mkdir -p #{testdir}/hieradata"
-on master, "if [ -f #{master['puppetpath']}/hiera.yaml ]; then cp #{master['puppetpath']}/hiera.yaml #{master['puppetpath']}/hiera.yaml.bak; fi"
+on master, "if [ -f #{master.puppet['confdir']}/hiera.yaml ]; then cp #{master.puppet['confdir']}/hiera.yaml #{master.puppet['confdir']}/hiera.yaml.bak; fi"
 
 apply_manifest_on master, <<-PP
 file { '#{testdir}/hiera.yaml':
@@ -71,9 +71,9 @@ class ntp {
 }
 PP
 
-on master, "chown -R #{master['user']}:#{master['group']} #{testdir}"
+on master, "chown -R #{master.puppet['user']}:#{master.puppet['group']} #{testdir}"
 on master, "chmod -R g+rwX #{testdir}"
-on master, "cat #{testdir}/hiera.yaml > #{master['puppetpath']}/hiera.yaml"
+on master, "cat #{testdir}/hiera.yaml > #{master.puppet['confdir']}/hiera.yaml"
 
 
 step "Try to lookup hash data"
@@ -97,9 +97,9 @@ end
 
 ensure step "Teardown"
 
-on master, "if [ -f #{master['puppetpath']}/hiera.conf.bak ]; then " +
-             "cat #{master['puppetpath']}/hiera.conf.bak > #{master['puppetpath']}/hiera.yaml; " +
-             "rm -rf #{master['puppetpath']}/hiera.yaml.bak; " +
+on master, "if [ -f #{master.puppet['confdir']}/hiera.conf.bak ]; then " +
+             "cat #{master.puppet['confdir']}/hiera.conf.bak > #{master.puppet['confdir']}/hiera.yaml; " +
+             "rm -rf #{master.puppet['confdir']}/hiera.yaml.bak; " +
            "fi"
 
 end

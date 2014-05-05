@@ -4,10 +4,10 @@ testdir = master.tmpdir('hiera')
 
 step 'Setup'
 on master, "mkdir -p #{testdir}/hieradata"
-on master, "if [ -f #{master['puppetpath']}/hiera.yaml ]; then cp #{master['puppetpath']}/hiera.yaml #{master['puppetpath']}/hiera.yaml.bak; fi"
+on master, "if [ -f #{master.puppet['confdir']}/hiera.yaml ]; then cp #{master.puppet['confdir']}/hiera.yaml #{master.puppet['confdir']}/hiera.yaml.bak; fi"
 
 apply_manifest_on master, <<-PP
-file { '#{master['puppetpath']}/hiera.yaml':
+file { '#{master.puppet['confdir']}/hiera.yaml':
   ensure  => present,
   content => '---
     :backends:
@@ -52,7 +52,7 @@ class apache {
 }
 PP
 
-on master, "chown -R #{master['user']}:#{master['group']} #{testdir}"
+on master, "chown -R #{master.puppet['user']}:#{master.puppet['group']} #{testdir}"
 on master, "chmod -R g+rwX #{testdir}"
 
 
@@ -79,6 +79,6 @@ end
 
 ensure step "Teardown"
 
-on master, "if [ -f #{master['puppetpath']}/hiera.conf.bak ]; then mv -f #{master['puppetpath']}/hiera.conf.bak #{master['puppetpath']}/hiera.yaml; fi"
+on master, "if [ -f #{master.puppet['confdir']}/hiera.conf.bak ]; then mv -f #{master.puppet['confdir']}/hiera.conf.bak #{master.puppet['confdir']}/hiera.yaml; fi"
 
 end

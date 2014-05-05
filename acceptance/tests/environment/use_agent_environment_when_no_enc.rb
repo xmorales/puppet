@@ -5,7 +5,7 @@ testdir = master.tmpdir('use_agent_env')
 create_remote_file(master, "#{testdir}/different.pp", 'notify { "production environment": }')
 create_remote_file(master, "#{testdir}/more_different.pp", 'notify { "more_different_string": }')
 
-on master, "chown -R #{master['user']}:#{master['group']} #{testdir}"
+on master, "chown -R #{master.puppet['user']}:#{master.puppet['group']} #{testdir}"
 on master, "chmod -R g+rwX #{testdir}"
 
 master_opts = {

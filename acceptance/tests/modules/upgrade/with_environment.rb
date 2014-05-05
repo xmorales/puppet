@@ -15,7 +15,7 @@ step 'Setup'
 
 stub_forge_on(master)
 
-puppet_conf = generate_base_legacy_and_directory_environments(master['puppetpath'])
+puppet_conf = generate_base_legacy_and_directory_environments(master.puppet['confdir'])
 
 install_test_module_in = lambda do |environment|
   on master, puppet("module install #{module_author}-#{module_name} --config=#{puppet_conf} --version 1.6.0 --environment=#{environment}") do
@@ -33,17 +33,17 @@ end
 
 step "Upgrade a module that has a more recent version published in a legacy environment" do
   install_test_module_in.call('legacyenv')
-  check_module_upgrade_in.call('legacyenv', "#{master['puppetpath']}/legacyenv/modules")
+  check_module_upgrade_in.call('legacyenv', "#{master.puppet['confdir']}/legacyenv/modules")
 end
 
 step 'Enable directory environments' do
   on master, puppet("config", "set",
-                    "environmentpath", "#{master['puppetpath']}/environments",
+                    "environmentpath", "#{master.puppet['confdir']}/environments",
                     "--section", "main",
                     "--config", puppet_conf)
 end
 
 step "Upgrade a module that has a more recent version published in a directory environment" do
   install_test_module_in.call('direnv')
-  check_module_upgrade_in.call('direnv', "#{master['puppetpath']}/environments/direnv/modules")
+  check_module_upgrade_in.call('direnv', "#{master.puppet['confdir']}/environments/direnv/modules")
 end
