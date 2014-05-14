@@ -230,14 +230,16 @@ Puppet::Type.newtype(:yumrepo) do
     newvalues(/.*/, :absent)
     validate do |value|
       next if value.to_s == 'absent'
-      parsed = URI.parse(value)
+      if value.to_s != '_none_'
+        parsed = URI.parse(value)
 
-      unless VALID_SCHEMES.include?(parsed.scheme)
-        raise "Must be a valid URL"
+        unless VALID_SCHEMES.include?(parsed.scheme)
+          raise "Must be a valid URL"
+        end
       end
     end
   end
-
+  
   newproperty(:proxy_username) do
     desc "Username for this proxy. #{ABSENT_DOC}"
 
